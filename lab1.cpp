@@ -1,3 +1,4 @@
+#include <chrono>
 #include <cmath>
 #include <float.h>
 #include <iostream>
@@ -184,21 +185,55 @@ void gauss_jordan(Matrix* mat, double* x)
     output(mat, x);
 }
 
+void enter_info(Matrix* mat, double* x)
+{
+    cout << "How you wanna fill your matrix?" << endl;
+    cout << "1) Random\n2) Enter it yourself\n> ";
+    int ans;
+    cin >> ans;
+    if (ans == 1) {
+        srand(time(0));
+        for (int i = 0; i < mat->n; i++) {
+            for (int j = 0; j < mat->m; j++) {
+                mat->a[i][j] = (double)(rand() % 100);
+            }
+            x[i] = (double)(rand() % 100);
+        }
+    } else {
+        for (int i = 0; i < mat->n; i++) {
+            for (int j = 0; j < mat->m; j++) {
+                cout << "a[" << i << "][" << j << "] = ";
+                cin >> mat->a[i][j];
+            }
+        }
+        for (int i = 0; i < mat->n; ++i) {
+            cout << "X[" << i << "] = ";
+            cin >> x[i];
+        }
+    }
+    cout << endl;
+    output(mat, x);
+    cout << "Choose one of the solution methods\n";
+    cout << "1) gauss\n2) gauss_jordan\n> ";
+    cin >> ans;
+    if (ans == 1)
+        gauss(mat, x);
+    else
+        gauss_jordan(mat, x);
+}
 int main()
 {
-    Matrix* mat = new_matrix(3, 3);
+    int a, b;
+    cout << "Enter the number of rows\n> ";
+    cin >> a;
+    cout << "Enter the number of collumns\n> ";
+    cin >> b;
+    Matrix* mat = new_matrix(a, b);
     double x[mat->n];
-    mat->a[0][0] = 0, mat->a[0][1] = 1, mat->a[0][2] = 0;
-    mat->a[1][0] = 0, mat->a[1][1] = 0, mat->a[1][2] = 0;
-    mat->a[2][0] = 0, mat->a[2][1] = 0, mat->a[2][2] = 0;
-    x[0] = 1, x[1] = 0, x[2] = 0;
-
-    output(mat, x);
-    // gauss_jordan(mat, x);
-    gauss(mat, x);
+    enter_info(mat, x);
     for (int i = 0; i < mat->n; i++) {
         if (x[i] != DBL_MAX)
-            cout << "x" << i + 1 << " " << x[i] << endl;
+            cout << "X" << i + 1 << " " << x[i] << endl;
     }
     cout << endl;
 }
