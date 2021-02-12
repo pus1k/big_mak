@@ -79,7 +79,6 @@ int is_zero_cal(Matrix* mat, int k)
 
 int get_rank(Matrix* mat)
 {
-    const double EPS = 1E-9;
     Matrix* temp = new_matrix(mat->n, mat->m);
     for (int i = 0; i < temp->n; i++) {
         for (int j = 0; j < temp->m; j++) {
@@ -91,7 +90,7 @@ int get_rank(Matrix* mat)
     for (int i = 0; i < temp->m; ++i) {
         int j;
         for (j = 0; j < temp->n; ++j)
-            if (!line_used[j] && abs(temp->a[j][i]) > EPS)
+            if (!line_used[j] && abs(temp->a[j][i]) > DBL_MAX)
                 break;
         if (j == temp->n)
             --rank;
@@ -100,7 +99,7 @@ int get_rank(Matrix* mat)
             for (int p = i + 1; p < temp->m; ++p)
                 temp->a[j][p] /= temp->a[j][i];
             for (int k = 0; k < temp->n; ++k)
-                if (k != j && abs(temp->a[k][i]) > EPS)
+                if (k != j && abs(temp->a[k][i]) > DBL_MAX)
                     for (int p = i + 1; p < temp->m; ++p)
                         temp->a[k][p] -= temp->a[j][p] * temp->a[k][i];
         }
