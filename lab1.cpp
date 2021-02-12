@@ -62,6 +62,20 @@ int is_zero_raw(Matrix* mat, double* x, int k)
         return 0;
     }
 }
+int is_zero_cal(Matrix* mat, int k)
+{
+    int i;
+    for (i = 0; i < mat->n; i++) {
+        if (mat->a[i][k] != 0) {
+            break;
+        }
+    }
+    if (i == mat->n) {
+        return 1;
+    } else {
+        return 0;
+    }
+}
 
 int get_rank(Matrix* mat)
 {
@@ -73,7 +87,7 @@ int get_rank(Matrix* mat)
         }
     }
     int rank = max(temp->n, temp->m);
-    vector<char> line_used(temp->n);
+    vector<bool> line_used(temp->n);
     for (int i = 0; i < temp->m; ++i) {
         int j;
         for (j = 0; j < temp->n; ++j)
@@ -106,6 +120,7 @@ void swap(Matrix* mat, double* x, int k)
             temp = x[k];
             x[k] = x[i];
             x[i] = temp;
+            return;
         }
     }
 }
@@ -149,10 +164,8 @@ void gauss(Matrix* mat, double* x)
             }
         }
         for (i = 0; i < mat->n; i++) {
-            for (j = 0; j < mat->m; j++) {
-                if (is_zero_raw(mat, x, i) == 1 && x[i] == 0) {
-                    x[i] = DBL_MAX;
-                }
+            if (is_zero_cal(mat, i) == 1) {
+                x[i] = DBL_MAX;
             }
         }
     } else {
@@ -166,60 +179,84 @@ void gauss_jordan(Matrix* mat, double* x)
     int i, j, i_target = 0;
     double c;
     for (i = 0; i < mat->n; i++) {
-        output(mat, x);
-        c = 1 / mat->a[i_target][i];
-        for (j = i; j < mat->n; j++) {
-            mat->a[i_target][j] *= c;
+        if (mat->a[i_target][i] == 0) {
+            swap(mat, x, i_target);
         }
-        x[i_target] *= c;
-        for (j = 0; j < mat->n; j++) {
-            if (j != i_target) {
-                x[j] -= mat->a[j][i] * x[i_target];
-                for (int l = mat->n - 1; l >= i; l--) {
-                    mat->a[j][l] -= mat->a[j][i] * mat->a[i_target][l];
+        if (mat->a[i_target][i] != 0) {
+            c = 1 / mat->a[i_target][i];
+            for (j = i; j < mat->n; j++) {
+                mat->a[i_target][j] *= c;
+            }
+            x[i_target] *= c;
+            for (j = 0; j < mat->n; j++) {
+                if (j != i_target) {
+                    x[j] -= mat->a[j][i] * x[i_target];
+                    for (int l = mat->n - 1; l >= i; l--) {
+                        mat->a[j][l] -= mat->a[j][i] * mat->a[i_target][l];
+                    }
                 }
             }
         }
         i_target++;
+        output(mat, x);
     }
-    output(mat, x);
+    for (int k = 0; k < mat->n; k++) {
+        if (is_zero_cal(mat, k) == 1) {
+            x[k] = DBL_MAX;
+        }
+    }
 }
 
 void enter_info(Matrix* mat, double* x)
 {
-    cout << "How you wanna fill your matrix?" << endl;
-    cout << "1) Random\n2) Enter it yourself\n> ";
-    int ans;
-    cin >> ans;
-    if (ans == 1) {
-        srand(time(0));
-        for (int i = 0; i < mat->n; i++) {
-            for (int j = 0; j < mat->m; j++) {
-                mat->a[i][j] = (double)(rand() % 100);
+    int flag = 1;
+    while (flag) {
+        cout << "How you wanna fill your matrix?" << endl;
+        cout << "1) Random\n2) Enter it yourself\n> ";
+        int ans;
+        cin >> ans;
+        cout << endl;
+        if (ans == 1) {
+            srand(time(0));
+            for (int i = 0; i < mat->n; i++) {
+                for (int j = 0; j < mat->m; j++) {
+                    mat->a[i][j] = (double)(rand() % 100);
+                }
+                x[i] = (double)(rand() % 100);
             }
-            x[i] = (double)(rand() % 100);
-        }
-    } else {
-        for (int i = 0; i < mat->n; i++) {
-            for (int j = 0; j < mat->m; j++) {
-                cout << "a[" << i << "][" << j << "] = ";
-                cin >> mat->a[i][j];
+        } else {
+            for (int i = 0; i < mat->n; i++) {
+                for (int j = 0; j < mat->m; j++) {
+                    cout << "a[" << i << "][" << j << "] = ";
+                    cin >> mat->a[i][j];
+                }
+            }
+            for (int i = 0; i < mat->n; ++i) {
+                cout << "X[" << i << "] = ";
+                cin >> x[i];
             }
         }
-        for (int i = 0; i < mat->n; ++i) {
-            cout << "X[" << i << "] = ";
-            cin >> x[i];
+        cout << endl;
+        output(mat, x);
+        cout << "Choose one of the solution methods\n";
+        cout << "1) gauss\n2) gauss_jordan\n> ";
+        cin >> ans;
+        cout << endl;
+        if (ans == 1)
+            gauss(mat, x);
+        else
+            gauss_jordan(mat, x);
+        for (int i = 0; i < mat->n; i++) {
+            if (x[i] != DBL_MAX)
+                cout << "X" << i + 1 << " " << x[i] << endl;
         }
+        cout << endl;
+        cout << "Do you wanna exit?\n1) Yes\n2) No\n> ";
+        cin >> ans;
+        if (ans == 1)
+            flag = 0;
+        cout << endl;
     }
-    cout << endl;
-    output(mat, x);
-    cout << "Choose one of the solution methods\n";
-    cout << "1) gauss\n2) gauss_jordan\n> ";
-    cin >> ans;
-    if (ans == 1)
-        gauss(mat, x);
-    else
-        gauss_jordan(mat, x);
 }
 int main()
 {
@@ -231,9 +268,4 @@ int main()
     Matrix* mat = new_matrix(a, b);
     double x[mat->n];
     enter_info(mat, x);
-    for (int i = 0; i < mat->n; i++) {
-        if (x[i] != DBL_MAX)
-            cout << "X" << i + 1 << " " << x[i] << endl;
-    }
-    cout << endl;
 }
