@@ -1,4 +1,8 @@
 *
-!.gitignore
+!Makefile
+!build
+!src
 !*.cpp
-*.h
+!*.h
+!.gitkeep
+!.gitignore
