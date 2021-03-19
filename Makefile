@@ -1,4 +1,4 @@
-all: lab1 lab2 lab3 lab4 clear
+all: lab1 lab2 lab3 lab4 lab6 clear
 
 lab1: build/lab1.o
 	g++ -o lab1 build/lab1.o
@@ -16,6 +16,10 @@ lab4: build/lab4.o
 	g++ -o lab4 build/lab4.o
 build/lab4.o: src/lab4.cpp
 	g++ -Wall -Werror -o build/lab4.o -c src/lab4.cpp
+lab6: build/lab6.o
+	g++ -o lab6 build/lab6.o
+build/lab6.o: src/lab6.cpp
+	g++ -Wall -Werror -o build/lab6.o -c src/lab6.cpp
 
 clear:
 	clear
