@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 all: lab1 lab2 lab3 lab4 lab5 lab6 lab10 lab11 lab12 clear
+=======
+all: lab1 lab2 lab3 lab4 lab6 lab10 lab11 lab12 clear
+>>>>>>> 22bf3911c56a07c3a4820db385b533e69cb0e9fb
 
 lab1: build/lab1.o
 	g++ -o lab1 build/lab1.o
@@ -39,5 +43,9 @@ build/lab12.o: src/lab12.cpp
 clear:
 	clear
 clean:
+<<<<<<< HEAD
 	rm -rf build/* lab1 lab2 lab3 lab4 lab5 lab6 lab10 lab11 lab12 tet
+=======
+	rm -rf build/* lab1 lab2 lab3 lab4 lab6 lab10 lab11 lab12
+>>>>>>> 22bf3911c56a07c3a4820db385b533e69cb0e9fb
 	clear
