@@ -1,7 +1,6 @@
 #include <cmath>
-#include <iomanip>
+// #include <iomanip>
 #include <iostream>
-#include <string>
 
 using std::cin;
 using std::cout;
@@ -88,35 +87,27 @@ void progon(double* a, double* b, double* c, double* d, double* X, int N)
 {
     double A[N - 1];
     double B[N];
-    // Прямой ход
     double x[N] = { 0 };
     A[0] = -1 * (c[0] / b[0]);
-
     if (d[0] != 0)
         B[0] = d[0] / b[0];
     else
         B[0] = 0;
-
     for (int j = 1; j < N - 1; j++) {
         A[j] = -1 * (c[j] / (b[j] + a[j] * A[j - 1]));
         B[j] = (d[j] - a[j] * B[j - 1]) / (b[j] + a[j] * A[j - 1]);
     }
-
     B[N - 1] = (d[N - 1] - a[N - 1] * B[N - 2]) / (b[N - 1] + a[N - 1] * A[N - 2]);
-
-    // Обратный ход
     x[N - 1] = B[N - 1];
     for (int i = N - 2; i > -1; i--) {
         x[i] = A[i] * x[i + 1] + B[i];
     }
     x[0] = x[N - 1] = 0;
-
-    // Вывод ответа
     for (int i = 0; i < N; i++) {
         X[i] = x[i];
         // cout << "X[" << i + 1 << "] = " << round(x[i] * 100) / 100 << " ";
     }
-    // cout << endl;
+    cout << endl;
 }
 
 double cube_splain_v2(double X, double* x, double* y, int size)
@@ -148,7 +139,7 @@ double cube_splain_v2(double X, double* x, double* y, int size)
         c[i] = alpha[i] * c[i + 1] + beta[i];
     for (int i = sect - 1; i > 0; --i) {
         h = x[i] - x[i - 1];
-        d[i] = (c[i] - c[i - 1]) / h;
+        d[i] = (c[i] - c[i - 1]) / (3 * h);
         b[i] = h * (2.0 * c[i] + c[i - 1]) / 6.0 + (y[i] - y[i - 1]) / h;
     }
     int i = 0;
@@ -160,10 +151,8 @@ double cube_splain_v2(double X, double* x, double* y, int size)
         while (X >= x[i] && i != size) {
             i++;
         }
-        i--;
     }
-    double dx = (X - x[i]);
-    return a[i] + (b[i] + (c[i] / 2.0 + d[i] * dx / 6.0) * dx) * dx;
+    return a[i] + (b[i] + (c[i] / 2.0 + d[i] * (X - x[i]) / 6.0) * (X - x[i])) * (X - x[i]);
 }
 
 double cube_splain(double X, double* x, double* y, int size)
@@ -207,15 +196,16 @@ double cube_splain(double X, double* x, double* y, int size)
     // }
     progon(a, b, c, d, M, size);
     int i = 0;
-    while (i != size && X >= x[i]) {
+    while (i < size && X >= x[i]) {
         i++;
     }
     double res = M[i - 1] * (x[i] - X) * (x[i] - X) * (x[i] - X) / (6 * h[i]);
     res += M[i] * (X - x[i - 1]) * (X - x[i - 1]) * (X - x[i - 1]) / (6 * h[i]);
-    res += (y[i - 1] - (M[i - 1] * h[i] * h[i]) / 6) * ((x[i] - X) / h[i]);
-    res += (y[i] - (M[i] * h[i] * h[i]) / 6) * ((X - x[i - 1]) / h[i]);
+    res += (y[i - 1] / h[i] - (M[i - 1] * h[i]) / 6) * (x[i] - X);
+    res += (y[i] - (M[i] * h[i]) / 6) * (X - x[i - 1]);
     return res;
 }
+
 int main()
 {
     int size;
@@ -230,9 +220,16 @@ int main()
         x = new double[size], y = new double[size];
         x[0] = 100.0, x[1] = 121.0, x[2] = 144.0;
         y[0] = 10.0, y[1] = 11.0, y[2] = 12.0;
-        // x[0] = 1.0, x[1] = 1.1, x[2] = 1.3, x[3] = 1.5, x[4] = 1.6;
-        // y[0] = 1.0, y[1] = 1.032, y[2] = 1.091, y[3] = 1.145, y[4] = 1.17;
         X = 115;
+        cout << "Lagrange result: " << Lagrange(X, x, y, size) << endl;
+    cout << "Niuton result: " << Niuton(X, x, y, size) << endl;
+    cout << "Aitken result: " << Eitken(X, x, y, size) << endl;
+    cout << "Cube splain result: " << cube_splain(X, x, y, size) << endl;
+    cout << "Cube splain v1.2 result: " << cube_splain_v2(X, x, y, size) << endl;
+        size = 5;
+        x[0] = 1, x[1] = 2, x[2] = 3, x[3] = 4, x[4] = 5;
+        y[0] = -12, y[1] = 32, y[2] = -86, y[3] = 234, y[4] = 22;
+        X = 3;
     } else {
         cout << "Do you wanna use func: ";
         cin >> ans;
@@ -265,8 +262,7 @@ int main()
         }
     }
     cout << "Lagrange result: " << Lagrange(X, x, y, size) << endl;
-    double res = Niuton(X, x, y, size);
-    cout << "Niuton result: " << res << endl;
+    cout << "Niuton result: " << Niuton(X, x, y, size) << endl;
     cout << "Aitken result: " << Eitken(X, x, y, size) << endl;
     cout << "Cube splain result: " << cube_splain(X, x, y, size) << endl;
     cout << "Cube splain v1.2 result: " << cube_splain_v2(X, x, y, size) << endl;
