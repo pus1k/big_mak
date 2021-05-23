@@ -37,8 +37,12 @@ lab12: build/lab12.o
 	g++ -o lab12 build/lab12.o
 build/lab12.o: src/lab12.cpp
 	g++ -Wall -Werror -o build/lab12.o -c src/lab12.cpp
+kurs: build/kurs.o
+	g++ -o kurs build/kurs.o
+build/kurs.o: src/kurs.cpp
+	g++ -Wall -Werror -o build/kurs.o -c src/kurs.cpp
 clear:
 	clear
 clean:
-	rm -rf build/* lab1 lab2 lab3 lab4 lab5 lab6 lab10 lab11 lab12 tet
+	rm -rf build/* lab1 lab2 lab3 lab4 lab5 lab6 lab10 lab11 lab12 tet *.txt kurs.png
 	clear

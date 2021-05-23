@@ -4,5 +4,6 @@
 !src
 !*.cpp
 !*.h
+!*.p
 !.gitkeep
 !.gitignore
